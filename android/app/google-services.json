@@ -12,7 +12,20 @@
           "package_name": "marcos.vinagre.proytecto_fin_de_curso"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "532269469513-94823i8erllklqqaubf3ehmid6roob5g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "marcos.vinagre.proytecto_fin_de_curso",
+            "certificate_hash": "3d4d2b7f20b3f81f18fc0f2ec774f62893ef5eaf"
+          }
+        },
+        {
+          "client_id": "532269469513-ugm5ti50ecd53jfb0s9552b5ic54ull3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBzZ9-J4bRWGx9YRnjfI8unv3RdT7TO7lg"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "532269469513-ugm5ti50ecd53jfb0s9552b5ic54ull3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "532269469513-qsjvuk9nip7crqrqedvsqo1nuo37ctmv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "marcos.vinagre.proytectoFinDeCurso"
+              }
+            }
+          ]
         }
       }
     }

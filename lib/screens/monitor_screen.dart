@@ -208,8 +208,18 @@ class _MonitorScreenState extends State<MonitorScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    const azul = Color(0xFF1976D2);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Monitoreo')),
+      appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/connect'); // Ajusta la ruta si tu pantalla se llama diferente
+            },
+          ),
+          title: const Text('Monitoreo')),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -240,6 +250,11 @@ class _MonitorScreenState extends State<MonitorScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: azul,
+                textStyle: const TextStyle(fontSize: 16),
+              ),
               onPressed: () {
                 Navigator.pushNamed(context, '/diagnosis');
               },

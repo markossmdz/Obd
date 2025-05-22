@@ -64,19 +64,54 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const azul = Color(0xFF1976D2);
+
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(status),
+            Text(
+              status,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _connect,
-              child: const Text('Conectar Bluetooth'),
+            // Botón con sombra
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: azul,
+                  textStyle: const TextStyle(fontSize: 16),
+                  elevation: 0, // La sombra la da el Container
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: _connect,
+                child: const Text('Conectar Bluetooth'),
+              ),
             ),
             const SizedBox(height: 20),
             TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: azul,
+                textStyle: const TextStyle(fontSize: 16),
+              ),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/monitor');
               },
