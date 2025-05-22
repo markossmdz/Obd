@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "532269469513",
+    "project_id": "obd-marcos",
+    "storage_bucket": "obd-marcos.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532269469513:android:4d76119514e24219a01498",
+        "android_client_info": {
+          "package_name": "marcos.vinagre.proytecto_fin_de_curso"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzZ9-J4bRWGx9YRnjfI8unv3RdT7TO7lg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
