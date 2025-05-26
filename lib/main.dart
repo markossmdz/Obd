@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proytecto_fin_de_curso/screens/viajes_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/connect_bluetooth_screen.dart';
 import 'screens/monitor_screen.dart';
@@ -20,11 +21,12 @@ class OBDApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'OBD-II Car',
       initialRoute: '/',
       routes: {
-        '/': (context) => const LoginScreen(),
+        '/': (context) => AuthGate(),
         '/connect': (context) => const ConnectBluetoothScreen(),
         '/monitor': (context) => const MonitorScreen(),
         '/diagnosis': (context) => const DiagnosisScreen(),
@@ -47,7 +49,9 @@ class AuthGate extends StatelessWidget {
             return ConnectBluetoothScreen();
           }
         }
-        return CircularProgressIndicator();
+        return Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
       },
     );
   }

@@ -39,26 +39,40 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       connection.output.add(utf8.encode('03\r'));
       await connection.output.allSent;
 
-      await for (Uint8List data in connection.input!) {
-        String response = ascii.decode(data);
-        log += response;
-        if (response.contains('43')) {
-          List<String> dtcs = _parseDTCResponse(response);
-          setState(() {
-            fallos = dtcs;
-            revision = dtcs.isNotEmpty ? 'Sí' : 'No';
-            cargando = false;
-          });
-          break;
+      try {
+        await for (Uint8List data in connection.input!.timeout(const Duration(seconds: 5))) {
+          String response = ascii.decode(data);
+          log += response;
+          if (response.contains('43')) {
+            List<String> dtcs = _parseDTCResponse(response);
+            setState(() {
+              fallos = dtcs;
+              revision = dtcs.isNotEmpty ? 'Sí' : 'No';
+              cargando = false;
+            });
+            break;
+          }
+          if (response.toUpperCase().contains('NO DATA') || response.toUpperCase().contains('NO DTC')) {
+            setState(() {
+              fallos = [];
+              revision = 'No';
+              cargando = false;
+            });
+            break;
+          }
         }
-        if (response.toUpperCase().contains('NO DATA') || response.toUpperCase().contains('NO DTC')) {
-          setState(() {
-            fallos = [];
-            revision = 'No';
-            cargando = false;
-          });
-          break;
-        }
+      } on TimeoutException {
+        setState(() {
+          cargando = false;
+          errorConexion = true;
+          log += '\nTimeout esperando respuesta del OBD-II.';
+        });
+      } catch (e) {
+        setState(() {
+          cargando = false;
+          errorConexion = true;
+          log += '\nError inesperado: $e';
+        });
       }
     } else {
       setState(() {
@@ -68,6 +82,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       });
     }
   }
+
 
   List<String> _parseDTCResponse(String response) {
     List<String> dtcs = [];
