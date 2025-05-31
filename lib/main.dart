@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:proytecto_fin_de_curso/screens/viajes_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/connect_bluetooth_screen.dart';
 import 'screens/monitor_screen.dart';
@@ -8,12 +7,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(OBDApp());
+  runApp(const OBDApp());
 }
 
 class OBDApp extends StatelessWidget {
@@ -21,14 +21,12 @@ class OBDApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'OBD-II Car',
       initialRoute: '/',
       routes: {
         '/': (context) => AuthGate(),
         '/connect': (context) => const ConnectBluetoothScreen(),
-        '/monitor': (context) => const MonitorScreen(),
         '/diagnosis': (context) => const DiagnosisScreen(),
       },
     );
@@ -38,18 +36,18 @@ class OBDApp extends StatelessWidget {
 class AuthGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
+    return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final user = snapshot.data;
           if (user == null) {
-            return LoginScreen();
+            return const LoginScreen();
           } else {
-            return ConnectBluetoothScreen();
+            return const ConnectBluetoothScreen();
           }
         }
-        return Scaffold(
+        return const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         );
       },

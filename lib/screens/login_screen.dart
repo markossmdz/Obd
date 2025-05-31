@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Error al iniciar sesión con Google: $e';
+        _error = 'Error al iniciar sesión con Google';
       });
     } finally {
       setState(() {
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
         height: 24,
         width: 24,
       ),
-      label: const Text('Sign in with Google'),
+      label: const Text('Iniciar sesión con Google'),
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -239,8 +239,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: _passwordController,
                         decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Password',
+                          labelText: 'Contraseña',
+                          hintText: 'Contraseña',
                           border: const OutlineInputBorder(),
                           suffixIcon: IconButton(
                             icon: Icon(_obscurePassword
@@ -264,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           GestureDetector(
                             onTap: _showPasswordResetDialog,
                             child: const Text(
-                              'Forgot password?',
+                              'Olvidaste la contraseña?',
                               style: TextStyle(
                                 color: azulClarito,
                                 fontWeight: FontWeight.w600,
@@ -295,8 +295,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (_formKey.currentState!.validate()) _login();
                               },
                               child: const Text(
-                                'Login',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
+                                'Iniciar Sesión',
+                                style: TextStyle(fontSize: 14, color: Colors.white),
                               ),
                             ),
                           ),
@@ -315,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               child: const Text(
                                 'Registrarse',
-                                style: TextStyle(fontSize: 18),
+                                style: TextStyle(fontSize: 14),
                               ),
                             ),
                           ),
@@ -328,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8),
                             child: Text(
-                              'or sign with',
+                              'O inicia sesión con',
                               style: TextStyle(color: Colors.black54),
                             ),
                           ),
