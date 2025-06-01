@@ -114,13 +114,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       color: Colors.red.shade50,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
       child: ListTile(
-        leading: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
+        leading: const Icon(Icons.warning_amber_rounded, color: Colors.blue, size: 32),
         title: Text(
           result.code,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 19, color: Colors.red),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 19, color: Colors.blue),
         ),
         subtitle: Text(result.description ?? ''),
-        trailing: Text(result.status, style: const TextStyle(color: Colors.red)),
+        trailing: Text(result.status, style: const TextStyle(color: Colors.blue)),
       ),
     );
   }
@@ -177,7 +177,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 child: ListView.builder(
                   itemCount: dtcResults.length,
                   itemBuilder: (context, index) {
-                    return _buildDTCItem(dtcResults[index]);
+                    return _buildNoFaultCard();
                   },
                 ),
               ),

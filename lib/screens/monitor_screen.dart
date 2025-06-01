@@ -328,11 +328,12 @@ class _MonitorScreenState extends State<MonitorScreen> {
                 children: [
                   _buildInfoCard('RPM', isDemoMode ? '---' : (rpm?.toString() ?? '---'), icon: Icons.speed),
                   _buildInfoCard('Velocidad', isDemoMode ? '---' : ('${velocidad ?? '---'} km/h'), icon: Icons.speed),
+                  _buildInfoCard('Consumo inst.', isDemoMode ? '---' : (consumoInst != null && consumoInst!.isFinite ? '${consumoInst!.toStringAsFixed(2)} L/100km' : 'En ralentí'), icon: Icons.local_gas_station),
                   _buildInfoCard('Temp. Motor', isDemoMode ? '---' : ('${tempMotor ?? '---'}°C'), icon: Icons.thermostat),
                   _buildInfoCard('Presión admisión', isDemoMode ? '---' : (presionAdmision != null ? '$presionAdmision kPa' : '---'), icon: Icons.compress),
                   _buildInfoCard('Temp. aire admisión', isDemoMode ? '---' : (tempAireAdmision != null ? '$tempAireAdmision°C' : '---'), icon: Icons.air),
                   _buildInfoCard('Flujo de Masa de Aire', isDemoMode ? '---' : (maf != null ? '${maf!.toStringAsFixed(2)} g/s' : '---'), icon: Icons.cloud),
-                  _buildInfoCard('Consumo inst.', isDemoMode ? '---' : (consumoInst != null && consumoInst!.isFinite ? '${consumoInst!.toStringAsFixed(2)} L/100km' : 'Ralentí'), icon: Icons.local_gas_station),
+
                 ],
               ),
             ),

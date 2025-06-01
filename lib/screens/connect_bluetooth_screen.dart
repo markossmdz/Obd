@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'monitor_screen.dart';
 
+
 final db = FirebaseFirestore.instance;
 
 final Map<String, List<String>> marcasModelos = {
@@ -81,6 +82,8 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
   String? _marcaSeleccionada;
   String? _modeloSeleccionado;
   List<String> _modelosDisponibles = [];
+  String? _vehiculoSeleccionado;
+
 
   @override
   void initState() {
@@ -308,38 +311,192 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
     });
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
+
+  Future<void> _showAddVehicleDialog(BuildContext context) async {
+    String? marcaSeleccionada;
+    String? modeloSeleccionado;
+    List<String> modelosDisponibles = [];
+
+    return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Problema de conexión'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                hasError = false;
-              });
-            },
-            child: const Text('Cerrar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _connect();
-            },
-            child: const Text('Reintentar'),
-          ),
-        ],
-      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Añadir vehículo'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Selecciona la marca y modelo de tu vehículo:',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 20),
+                    DropdownButton<String>(
+                      value: marcaSeleccionada,
+                      hint: const Text('Elige una marca'),
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          marcaSeleccionada = newValue;
+                          modelosDisponibles = marcasModelos[newValue] ?? [];
+                          modeloSeleccionado = null;
+                        });
+                      },
+                      items: marcasVehiculos.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButton<String>(
+                      value: modeloSeleccionado,
+                      hint: const Text('Elige un modelo'),
+                      isExpanded: true,
+                      onChanged: marcaSeleccionada == null ? null : (String? newValue) {
+                        setState(() {
+                          modeloSeleccionado = newValue;
+                        });
+                      },
+                      items: modelosDisponibles.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: (marcaSeleccionada != null && modeloSeleccionado != null)
+                      ? () async {
+                    await _addVehicle(marcaSeleccionada!, modeloSeleccionado!);
+                    Navigator.of(context).pop();
+                  }
+                      : null,
+                  child: Text(
+                    'Añadir',
+                    style: TextStyle(
+                      color: (marcaSeleccionada != null && modeloSeleccionado != null)
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
+  }
+
+  Future _addVehicle(String marca, String modelo) async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      await db.collection('garaje').add({
+        'usuarioId': user.uid,
+        'marca': marca,
+        'modelo': modelo,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Vehículo $marca $modelo añadido correctamente'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al añadir vehículo: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
   void dispose() {
     connection?.dispose();
     super.dispose();
+  }
+
+  Widget _buildGarajeExpansionTile() {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const SizedBox.shrink();
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: db
+          .collection('garaje')
+          .where('usuarioId', isEqualTo: user.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return ExpansionTile(
+            leading: Icon(Icons.garage),
+            title: Text('Garaje'),
+            children: [
+              ListTile(title: Text('Error al cargar vehículos')),
+            ],
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return ExpansionTile(
+            leading: Icon(Icons.garage),
+            title: Text('Garaje'),
+            children: [
+              ListTile(title: Text('Cargando...')),
+            ],
+          );
+        }
+
+        final vehiculos = snapshot.data!.docs;
+
+        return ExpansionTile(
+          leading: Icon(Icons.garage),
+          title: Text('Garaje'),
+          children: [
+            // Lista de vehículos existentes
+            ...vehiculos.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              final nombreVehiculo = '${data['marca']} ${data['modelo']}';
+              final isSelected = _vehiculoSeleccionado == nombreVehiculo;
+              return ListTile(
+                leading: Icon(
+                  Icons.directions_car,
+                  color: isSelected ? Colors.blue : Colors.grey,
+                ),
+                title: Text(nombreVehiculo),
+                trailing: isSelected ? Icon(Icons.check, color: Colors.blue) : null,
+                onTap: () {
+                  setState(() {
+                    _vehiculoSeleccionado = nombreVehiculo;
+                  });
+                },
+              );
+            }).toList(),
+            // Opción para añadir vehículo
+            ListTile(
+              leading: Icon(Icons.add, color: Colors.green),
+              title: Text('Añadir vehículo'),
+              onTap: () => _showAddVehicleDialog(context),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -380,6 +537,8 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
                 ),
               ),
             ),
+            _buildGarajeExpansionTile(),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Cerrar sesión'),
