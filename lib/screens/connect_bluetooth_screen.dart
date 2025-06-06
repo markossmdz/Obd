@@ -127,7 +127,7 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>?;
         if (data != null) {
-          return data['marca'] != null && data['modelo'] != null;
+          return true;
         }
       }
     } catch (e) {
@@ -203,6 +203,12 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
                           'marca': _marcaSeleccionada,
                           'modelo': _modeloSeleccionado,
                         }, SetOptions(merge: true));
+
+                        await db.collection('garaje').add({
+                          'usuarioId': user.uid,
+                          'marca': _marcaSeleccionada,
+                          'modelo': _modeloSeleccionado,
+                        });
 
                         Navigator.of(context).pop();
 
@@ -484,6 +490,7 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
                   setState(() {
                     _vehiculoSeleccionado = nombreVehiculo;
                   });
+                  Navigator.of(context).pop();
                 },
               );
             }).toList(),
@@ -527,7 +534,7 @@ class _ConnectBluetoothScreenState extends State<ConnectBluetoothScreen> {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: const Color(0xFF001823),
               ),
               child: Text(
                 'Menú',

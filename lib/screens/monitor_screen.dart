@@ -288,7 +288,7 @@ class _MonitorScreenState extends State<MonitorScreen> {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: const Color(0xFF001823),
               ),
               child: Text(
                 'Menú',

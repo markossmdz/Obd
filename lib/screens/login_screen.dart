@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,6 +14,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
+  final _registerEmailController = TextEditingController();
+  final _registerPasswordController = TextEditingController();
+  final _registerConfirmPasswordController = TextEditingController();
+
   String _error = '';
   bool _loading = false;
   bool _obscurePassword = true;
@@ -39,27 +46,128 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _register() async {
-    setState(() {
-      _loading = true;
-      _error = '';
-    });
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-      Navigator.pushReplacementNamed(context, '/connect');
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _error = e.message ?? 'Error desconocido';
-      });
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
+  void _showRegisterDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final _formKey = GlobalKey<FormState>();
+        bool _loading = false;
+        String _error = '';
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Registro'),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(labelText: 'Nombre'),
+                        validator: (value) =>
+                        value == null || value.isEmpty ? 'Introduce tu nombre' : null,
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _surnameController,
+                        decoration: InputDecoration(labelText: 'Apellidos'),
+                        validator: (value) =>
+                        value == null || value.isEmpty ? 'Introduce tus apellidos' : null,
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _registerEmailController,
+                        decoration: InputDecoration(labelText: 'Correo electrónico'),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) =>
+                        value != null && value.contains('@') ? null : 'Email no válido',
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _registerPasswordController,
+                        decoration: InputDecoration(labelText: 'Contraseña'),
+                        obscureText: true,
+                        validator: (value) =>
+                        value != null && value.length >= 6 ? null : 'Mínimo 6 caracteres',
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _registerConfirmPasswordController,
+                        decoration: InputDecoration(labelText: 'Confirmar contraseña'),
+                        obscureText: true,
+                        validator: (value) =>
+                        value == _registerPasswordController.text
+                            ? null
+                            : 'Las contraseñas no coinciden',
+                      ),
+                      if (_error.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(_error, style: TextStyle(color: Colors.red)),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: _loading
+                      ? null
+                      : () async {
+                    if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        _loading = true;
+                        _error = '';
+                      });
+                      try {
+                        final cred = await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: _registerEmailController.text.trim(),
+                          password: _registerPasswordController.text,
+                        );
+                        await FirebaseFirestore.instance
+                            .collection('usuarios')
+                            .doc(cred.user!.uid)
+                            .set({
+                          'Nombre': _nameController.text.trim(),
+                          'Apellido': _surnameController.text.trim(),
+                          'Email': _registerEmailController.text.trim(),
+                        });
+                        Navigator.of(dialogContext).pop();
+                        Navigator.pushReplacementNamed(context, '/connect');
+                      } on FirebaseAuthException catch (e) {
+                        setState(() {
+                          _error = e.message ?? 'Error';
+                        });
+                      } finally {
+                        setState(() {
+                          _loading = false;
+                        });
+                      }
+                    }
+                  },
+                  child: _loading
+                      ? SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : Text('Registrarse'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
+
 
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -223,7 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.black54,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 50),
                       TextFormField(
                         controller: _emailController,
                         decoration: const InputDecoration(
@@ -310,9 +418,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) _register();
-                              },
+                              onPressed: _showRegisterDialog,
                               child: const Text(
                                 'Registrarse',
                                 style: TextStyle(fontSize: 14),
